@@ -8,7 +8,7 @@
         </div>
 
         <form id="searchform" method="get" :action="link">
-            <input type="text" name="q">
+            <input type="text" name="q" placeholder="Search the internet">
         </form>
 
     </div>
@@ -23,7 +23,7 @@ export default {
             choice: 0,
             seldiv: document.getElementById('selector'),
             lastScrollTop: 0,
-            link: "https://www.google.com/search"
+            link: "https://duckduckgo.com/?q="
         }
     },
     created () {
