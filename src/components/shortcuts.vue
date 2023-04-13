@@ -7,6 +7,7 @@
                 <p id="social">Social</p>
                 <p id="school">School</p>
                 <p id="linux">Linux</p>
+                <p id="music">Music</p>
                 <p id="private">Private (0_0,)</p>
             </div>
             <div id="options">
@@ -24,8 +25,15 @@
 export default {
     name: "shortcuts",
     mounted() {
+        document.getElementById('all').className = 'selected';
+        document.getElementById('music').className = '';
+        document.getElementById('dev').className = '';
+        document.getElementById('social').className = '';
+        document.getElementById('school').className = '';
+        document.getElementById('linux').className = '';
+        document.getElementById('private').className = '';
+
         document.getElementById('filter').addEventListener('click', this.setFilter)
-        let scutsholder = document.getElementById('scutshold')
         //gen scuts key in localstorage if non existent
         if(localStorage.getItem('scuts') === null){
             let newscutsjson = {
@@ -33,9 +41,9 @@ export default {
                 tags: {
                     private: [
                         {
-                            name: 'phub',
-                            iconLink: 'https://1000logos.net/wp-content/uploads/2017/12/Pornhub-symbol.jpg',
-                            link: 'www.pornhub.com'
+                            name: 'Cornhub',
+                            iconLink: 'https://pbs.twimg.com/profile_images/609214434930782209/-0Es6OzU_400x400.jpg',
+                            link: 'https://cornhub.website/'
                         }
                     ],
                     linux: [
@@ -62,8 +70,20 @@ export default {
                     dev: [
                         {
                             name: 'Github',
-                            iconLink: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+                            iconLink: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
                             link: 'https://github.com'
+                        }
+                    ],
+                    music: [
+                        {
+                            name: 'Ghost Hack',
+                            iconLink: 'https://s3-eu-west-1.amazonaws.com/tpd/logos/5cd702fb0fb4a100010dc160/0x0.png',
+                            link: 'https://www.ghosthack.de/'
+                        },
+                        {
+                            name: 'Looperman',
+                            iconLink: 'https://i0.wp.com/djtechtools.com/wp-content/uploads/2012/05/looperman-logo.png?resize=200%2C200',
+                            link: 'https://www.looperman.com'
                         }
                     ]
                 }
@@ -73,49 +93,45 @@ export default {
         //init shortcuts
         this.shortcutstorage = JSON.parse(localStorage.getItem('scuts'))
         //add event for update shortcuts list
-        window.addEventListener('updatescuts', (e) => {
+        this.emitter.on('updatescuts', ()=>{
             //update local shortcutstorage
+            this.shortcutstorage = JSON.parse(localStorage.getItem('scuts'))
             //rerender list
+            console.log(this.shortcutstorage)
+            this.renderscuts()
         })
         //first render, render all
-        let tagsdata = this.shortcutstorage.tags
-        for(let tag in tagsdata){
-            if(tag === 'private'){
-            }else {
-            for(let jscut in tagsdata[tag]){
-                let data = tagsdata[tag][jscut]
-                let newA = document.createElement('a')
-                newA.className = 'scut'
-                let innerDiv = document.createElement('div')
-                innerDiv.className = 'scutcard'
-                newA.appendChild(innerDiv)
-                let img = document.createElement('img')
-                img.src = data.iconLink
-                newA.href = data.link
-                let newP = document.createElement("p")
-                newP.innerHTML = data.name
-                newA.appendChild(newP)
-                innerDiv.appendChild(img)
-                //.scut .scutcard
-                scutsholder.appendChild(newA)
-            }
-            }
-        }
+        this.renderscuts()
     },
     data(){
         return{
             shortcutstorage: null,
-            currentfilt: 'all'
+            currentfilt: 'all',
+        }
+    },
+    computed:{
+        showpin(){
+            return this.currentfilt === 'private'
+        },
+        pincode(){
+            if(localStorage.getItem('pincode')){
+                return localStorage.getItem('pincode')
+            }else {
+                //set default pincode
+                localStorage.setItem('pincode', '1234')
+                return localStorage.getItem('pincode')
+            }
         }
     },
     methods:{
         showcuts(){
-            console.log(this.shortcutstorage)
+            this.emitter.emit('addcutmodal')
         },
         setFilter(e){
             if(e.target.nodeName === "P"){
                 //reset filters
                 document.getElementById('all').className = '';
+                document.getElementById('music').className = '';
                 document.getElementById('dev').className = '';
                 document.getElementById('social').className = '';
                 document.getElementById('school').className = '';
@@ -129,16 +145,25 @@ export default {
 
                 //clear shortcuts render
                 scutshold.innerHTML = ''
+                console.log(this.showpin)
 
                 //render filtered shortcuts
                     //if id = all, render all
                 let tagsdata = this.shortcutstorage.tags
+                console.log(this.currentfilt)
                 if(this.currentfilt === 'all'){
-                    for(let tag in tagsdata){
-                        if(tag === 'private'){
-                        }else {
-                            for(let jscut in tagsdata[tag]){
-                                let data = tagsdata[tag][jscut]
+                    this.renderscuts();
+                }else if(this.currentfilt === 'private'){
+                    scutshold.innerHTML = '<form id="placepin" v-if="showpin">\n' +
+                        '            <input id="pinfinput" type="password" pattern="[0-9]+" placeholder="Pin">\n' +
+                        '            </form>'
+                    document.getElementById('placepin').addEventListener('submit', (e)=>{
+                        e.preventDefault()
+                        let input = document.getElementById('pinfinput')
+                        if(input.value === this.pincode){
+                            scutshold.innerHTML = ''
+                            for(let jscut in tagsdata[this.currentfilt]){
+                                let data = tagsdata[this.currentfilt][jscut]
                                 let newA = document.createElement('a')
                                 newA.className = 'scut'
                                 let innerDiv = document.createElement('div')
@@ -154,9 +179,14 @@ export default {
                                 //.scut .scutcard
                                 scutshold.appendChild(newA)
                             }
+                        }else{
+                            input.value = '';
+                            input.placeholder = 'pin incorrect'
                         }
-                    }
-                }else{
+
+                    })
+                }
+                else{
                     for(let jscut in tagsdata[this.currentfilt]){
                         let data = tagsdata[this.currentfilt][jscut]
                         let newA = document.createElement('a')
@@ -176,6 +206,33 @@ export default {
                     }
                 }
             }
+        },
+        renderscuts(){
+            let scutsholder = document.getElementById('scutshold')
+            scutsholder.innerHTML = ''
+            let tagsdata = this.shortcutstorage.tags
+            for(let tag in tagsdata){
+                if(tag === 'private'){
+                }else {
+                    for(let jscut in tagsdata[tag]){
+                        let data = tagsdata[tag][jscut]
+                        let newA = document.createElement('a')
+                        newA.className = 'scut'
+                        let innerDiv = document.createElement('div')
+                        innerDiv.className = 'scutcard'
+                        newA.appendChild(innerDiv)
+                        let img = document.createElement('img')
+                        img.src = data.iconLink
+                        newA.href = data.link
+                        let newP = document.createElement("p")
+                        newP.innerHTML = data.name
+                        newA.appendChild(newP)
+                        innerDiv.appendChild(img)
+                        //.scut .scutcard
+                        scutsholder.appendChild(newA)
+                    }
+                }
+            }
         }
     }
 }
@@ -184,12 +241,24 @@ export default {
 <style>
 @import "@catppuccin/palette/style";
 
+#pininput {
+    background-color: var(--ctp-mocha-surface0);
+    width: 6em;
+    height: 2vh;
+    border-radius: 1em;
+    border: var(--ctp-mocha-crust) 2px solid;
+}
+#pininput:invalid{
+    border: var(--ctp-mocha-red) 2px solid;
+}
+
 #scutshold{
     display: flex;
     flex-flow: row wrap;
     width: 56em;
     justify-content: space-evenly;
     min-height: 5em;
+    margin-top: 1em;
 }
 #shortcuts{
     display: flex;

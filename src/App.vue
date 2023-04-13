@@ -22,6 +22,16 @@ export default {
             newscut: false,
             settingsmod: false,
         }
+    },
+    mounted() {
+        this.emitter.on('addcutmodal', ()=>{
+            this.newscut = !this.newscut
+            console.log('Set mod')
+        })
+        this.emitter.on('closeaddcut', ()=>{
+            this.newscut = false
+            console.log('closing')
+        })
     }
 }
 </script>
