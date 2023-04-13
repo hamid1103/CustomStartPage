@@ -11,7 +11,7 @@
                 <p id="private">Private (0_0,)</p>
             </div>
             <div id="options">
-                <h3>Settings</h3>
+                <h3 @click="showsettings">Settings</h3>
                 <h3 @click="showcuts">Add Shortcut</h3>
             </div>
         </div>
@@ -127,6 +127,9 @@ export default {
         showcuts(){
             this.emitter.emit('addcutmodal')
         },
+        showsettings(){
+            this.emitter.emit('showsetmodal')
+        },
         setFilter(e){
             if(e.target.nodeName === "P"){
                 //reset filters
@@ -145,12 +148,10 @@ export default {
 
                 //clear shortcuts render
                 scutshold.innerHTML = ''
-                console.log(this.showpin)
 
                 //render filtered shortcuts
                     //if id = all, render all
                 let tagsdata = this.shortcutstorage.tags
-                console.log(this.currentfilt)
                 if(this.currentfilt === 'all'){
                     this.renderscuts();
                 }else if(this.currentfilt === 'private'){
@@ -241,14 +242,14 @@ export default {
 <style>
 @import "@catppuccin/palette/style";
 
-#pininput {
+#pinfinput {
     background-color: var(--ctp-mocha-surface0);
-    width: 6em;
+    width: 8em;
     height: 2vh;
     border-radius: 1em;
     border: var(--ctp-mocha-crust) 2px solid;
 }
-#pininput:invalid{
+#pinfinput:invalid{
     border: var(--ctp-mocha-red) 2px solid;
 }
 

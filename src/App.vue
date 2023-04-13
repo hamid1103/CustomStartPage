@@ -8,6 +8,11 @@ import SettingsModal from "./components/settingsModal.vue";
 
 <template>
     <div id="main">
+
+        <div id="DateTime">
+            <p>{{time}}</p>
+            <p>{{date}}</p>
+        </div>
         <searchbar></searchbar>
         <shortcuts></shortcuts>
         <newscutmodal v-show="newscut"></newscutmodal>
@@ -21,7 +26,12 @@ export default {
         return{
             newscut: false,
             settingsmod: false,
+            time: '',
+            date: ''
         }
+    },
+    created() {
+        setInterval(this.getnow, 1000);
     },
     mounted() {
         this.emitter.on('addcutmodal', ()=>{
@@ -32,6 +42,21 @@ export default {
             this.newscut = false
             console.log('closing')
         })
+        this.emitter.on('showsetmodal', ()=>{
+            this.settingsmod = true
+        })
+        this.emitter.on('closesetmodal', ()=>{
+            this.settingsmod = false
+        })
+    },
+    methods: {
+        getnow(){
+            const today = new Date();
+            const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+            const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            this.date = date;
+            this.time = time;
+        }
     }
 }
 </script>
@@ -45,6 +70,13 @@ export default {
     align-items: center;
     align-content: center;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+}
+#DateTime{
+    height: 2em;
+    width: 30em;
+    display: flex;
+    margin: 1em;
+    justify-content: space-between;
 }
 </style>

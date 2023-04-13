@@ -165,7 +165,7 @@ export default {
 #close {
     background-color: var(--ctp-mocha-red);
     width: 15vw;
-    height: 3vh;
+    min-height: 3vh;
     border-radius: 1em;
     font-size: 2em;
     color: white;
@@ -176,7 +176,7 @@ export default {
     font-size: 2em;
     background-color: var(--ctp-mocha-sky);
     width: 15vw;
-    height: 3vh;
+    min-height: 3vh;
     border-radius: 1em;
 }
 
