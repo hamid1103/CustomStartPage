@@ -2,6 +2,6 @@
 
 Custom web startpage made with Vite
 
-Clone
-terminal: npm install
+Clone with git  
+terminal: npm install  
 Terminal: npm run dev
