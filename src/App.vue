@@ -4,13 +4,18 @@ import Searchbar from "./components/searchbar.vue";
 import Shortcuts from "./components/shortcuts.vue";
 import Newscutmodal from "./components/newscutmodal.vue";
 import SettingsModal from "./components/settingsModal.vue";
+import WidgetsContainer from "./components/widgetsContainer.vue";
 </script>
 
 <template>
     <div id="main">
-
+        <WidgetsContainer></WidgetsContainer>
         <div id="DateTime">
             <p>{{time}}</p>
+            <div id="weather">
+                <img :src="weatherimg" :alt="weatherimg">
+                <p>{{weatherString}} &#8451;</p>
+            </div>
             <p>{{date}}</p>
         </div>
         <searchbar></searchbar>
@@ -27,7 +32,9 @@ export default {
             newscut: false,
             settingsmod: false,
             time: '',
-            date: ''
+            date: '',
+            weatherString: '',
+            weatherimg: ''
         }
     },
     created() {
@@ -48,6 +55,8 @@ export default {
         this.emitter.on('closesetmodal', ()=>{
             this.settingsmod = false
         })
+        this.setWeather()
+
     },
     methods: {
         getnow(){
@@ -56,6 +65,34 @@ export default {
             const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
             this.date = date;
             this.time = time;
+        },
+        setWeather(){
+            fetch(import.meta.env.VITE_weather_api_link, {
+                "method": "GET",
+                "headers": {
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw response;
+                    }
+                    return response.json();
+                }).then(response => {
+                    //determine icon
+                    let iconDesc = response.currentConditions.icon;
+                    let imglink = 'https://github.com/visualcrossing/WeatherIcons/blob/main/PNG/4th%20Set%20-%20Color/' + iconDesc + '.png?raw=true'
+                    this.weatherimg = imglink
+                    //set Conditions
+                    let condition = response.description;
+                    //set temperature
+                    let temps = response.currentConditions.temp;
+                    let weathtotalstring = condition + 'It is ' + temps
+                    this.weatherString = weathtotalstring
+                    console.log(response);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
         }
     }
 }
@@ -74,9 +111,14 @@ export default {
 }
 #DateTime{
     height: 2em;
-    width: 30em;
+    min-width: 30em;
     display: flex;
     margin: 1em;
     justify-content: space-between;
+}
+#weather{
+    display: flex;
+    min-width: 10em;
+    justify-content: center;
 }
 </style>

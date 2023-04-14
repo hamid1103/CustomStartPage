@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@catppuccin/palette": "^0.1.8",
+    "dotenv": "^16.0.3",
     "emailjs-imap-client": "^3.1.0",
     "mitt": "^3.0.0",
     "vue": "^3.2.47"
